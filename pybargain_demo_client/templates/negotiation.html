@@ -1,0 +1,127 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- START NEGOTIATION.HTML -->
+<div class="spacer40"></div>
+
+<ul class="nav nav-pills" id="nego-tab">
+	<li class="active"><a href="#nego-log" data-toggle="tab">Negotiation logs</a></li>
+	{% if not params_tpl["completed"] %}
+		<li><a href="#your-offer" data-toggle="tab">Send a new offer</a></li>
+	{% endif %}
+</ul>
+
+<div class="tab-content msgchain">
+
+	<div class="tab-pane active" id="nego-log">
+		<div class="spacer20"></div>
+		{% for msg in params_tpl["chain"] | reverse %}
+			<div class="row {{ loop.cycle('msg-odd', 'msg-even') }}">
+				<div class="span4 collapse-group">
+					<label class="msg-header"><a class="btn" href="#">{{ format_msg_header(msg) }}</a></label>
+					{% if not msg.msg_type == 'bargainingrequest' %}
+						<blockquote class="msg-memo">{{ format_memo(msg.details.memo) }}</blockquote>
+					{% endif %}
+					<div class="collapse">
+						<div class="msg-details">
+							<div class="spacer5"></div>
+							{% if msg.msg_type == 'bargainingrequest' %}	
+								<label>Negotiation expiry date</label>
+								<p>{{ format_date(msg.details.expires) }}</p>								
+							{% elif msg.msg_type == 'bargainingrequestack' %}
+								<label>Negotiation expiry date</label>
+								<p>{{ format_date(msg.details.expires) }}</p>
+								<label>Outputs</label>
+								<pre class="pre-scrollable outputs">{{ format_outputs(msg.details.outputs) }}</pre>
+							{% elif msg.msg_type == 'bargainingproposal' %}
+								<label>Transactions</label>
+								<pre class="pre-scrollable txs">{{ format_txs(msg.details.transactions) }}</pre>
+								<label>Raw Transactions</label>
+								<pre class="pre-scrollable txs">{{ format_raw_txs(msg.details.transactions) }}</pre>
+							{% elif msg.msg_type == 'bargainingproposalack' %}
+								<label>Outputs</label>
+								<pre class="pre-scrollable outputs">{{ format_outputs(msg.details.outputs) }}</pre>			
+							{% elif msg.msg_type == 'bargainingcompletion' %}
+								<label>Transactions</label>
+								<pre class="pre-scrollable txs">{{ format_txs(msg.details.transactions) }}</pre>
+								<label>Raw Transactions</label>
+								<pre class="pre-scrollable txs">{{ format_raw_txs(msg.details.transactions) }}</pre>
+							{% endif %}
+							<label>Message status</label>
+							<p>{{ format_status(msg) }}</p>
+							<label>Signature</label>
+							<pre>{{ msg.signature }}</pre>
+							<div class="spacer5"></div>
+						</div>
+						<div class="spacer10"></div>	
+					</div>			
+				</div>
+			</div>
+			<div class="spacer10"></div>
+		{% endfor %}		
+	</div>
+	
+	<div class="tab-pane" id="your-offer">
+		<div class="spacer40"></div>
+		<form role="form" id="your-offer-form" method="post">
+			<div class="form-group">
+				<label>Price</label>
+				<input type="text" name="amount" id="amount" class="form-control" placeholder="Enter the amount ({{ params_tpl['wallet_blc'] }} BTC available)">
+			</div>
+			<div class="form-group">
+				<label>Message</label>
+				<textarea name="memo" id="memo" class="form-control" placeholder="Enter your message"></textarea>
+			</div>
+			<a id="send" class="btn btn-success" data-loading-text="Processing">Send the offer</a>
+			<a id="cancel" class="btn btn-success" data-loading-text="Processing">Stop the negotiation</a>
+			</form>
+		<div class="spacer40"></div>
+	</div>
+</div>
+<script>
+$(function () {
+	errors = "{{ params_tpl['errors'] }}"
+	if (errors) {
+		alert("Operation aborted:\n" + errors)
+	}
+	
+	$('#nego-tab a:first').tab('show')
+	
+	$('.row .btn').on('click', function(e) {
+	    e.preventDefault();
+	    var $this = $(this);
+	    var $collapse = $this.closest('.collapse-group').find('.collapse');
+	    $collapse.collapse('toggle');
+	});
+	
+	$('#send').on('click', function() {
+	  sendOffer();
+	});
+	
+	$('#cancel').on('click', function() {
+	  cancelNego();
+	});
+});
+
+function sendOffer() {
+	if (! $.isNumeric($("#amount").val())) {
+		alert("Price must be a numeric value");
+	}
+	else if (parseFloat($("#amount").val()) > {{ params_tpl['wallet_blc'] }}) {
+		alert("Operation aborted:\nPrice is too high (your balance is {{ params_tpl['wallet_blc'] }})")
+	}
+	else {
+		$("#send").attr("disabled", true);
+		$("#cancel").attr("disabled", true);	
+		$("#your-offer-form").submit();	
+	}
+}
+
+function cancelNego() {
+	$("#send").attr("disabled", true);
+	$("#cancel").attr("disabled", true);	
+	$("#amount").val("0");
+	$("#your-offer-form").submit();
+}
+</script>
+<!-- END NEGOTIATION.HTML -->
+{% endblock %}

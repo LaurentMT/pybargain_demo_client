@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+<!-- START FEEDTHEWALLET.HTML -->
+<div class="jumbotron">
+	<p>
+		This demo runs on the bitcoin test network<br/>
+		It simulates an online wallet allowing to bargain with a seller
+	</p>
+	<div class="spacer10"></div>	
+	<p>
+		<strong>Right now, the wallet contains {{ params_tpl['wallet_blc'] }} BTC</strong>
+	</p>
+	<div class="spacer10"></div>
+	<p>
+		If the wallet seems empty,<br/>
+		please visit this <a target="window" href="http://tpfaucet.appspot.com/">testnet faucet</a>
+		and send some love to mryyjA6YpPCJ24MsSN7YnCK6M3NZoUAwxb
+	</p>
+	<div class="spacer10"></div>
+	<p><a class="btn btn-lg btn-success" href="negotiation" role="button">Let's bargain !</a></p>
+</div>
+<!-- END FEEDTHEWALLET.HTML -->
+{% endblock %}

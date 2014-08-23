@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Bargaining Protocol - Demonstration site</title>	
+		<link rel=stylesheet type=text/css media="all" href="{{ url_for('static', filename='demo.css') }}">
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+		<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>		
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<ul class="nav nav-pills pull-right">
+					{% if session.nid %}
+						<li class="active"><a href="/negotiation">Negotiation</a></li>
+					{% endif %}					
+					<li><a href="https://github.com/LaurentMT/bargaining_protocol">GitHub</a></li>
+					<li><a href="https://github.com/LaurentMT/bargaining_protocol/blob/master/specs_draft.md">Specifications</a></li>
+				</ul>
+				<h3><a class="text-muted" style="text-decoration: none;" href="/">Bargaining Protocol</a></h3>
+			</div>
+			{% block body %}{% endblock %}
+		</div>	
+	</body>
+</html>
